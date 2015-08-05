@@ -39,7 +39,7 @@ typedef struct __GFifo__{
 #define  GFIFO_EMPTY(fifo)   			(GFIFO_LEN(fifo)<=0)
 
 #define  GFIFO_TOP(fifo,type)    		(GFIFO_EMPTY(fifo)==0?((type *)(fifo)->data)[(fifo)->tail]:-1)
-
+/*
 #define  GFIFO_OUT(fifo,temp,type)		{if(!GFIFO_EMPTY(fifo)){\
 temp = ((type *)(fifo)->data)[(fifo)->tail];\
 (fifo)->tail = ((fifo)->tail+1)%(fifo)->maxSize;\
@@ -47,22 +47,37 @@ temp = ((type *)(fifo)->data)[(fifo)->tail];\
 }else{\
 temp = *(type *)0;\
 }\
-}
-
+}*/
+#define  GFIFO_OUT(fifo,temp,type)		((!GFIFO_EMPTY(fifo))?\
+temp = ((type *)(fifo)->data)[(fifo)->tail],\
+(fifo)->tail = ((fifo)->tail+1)%(fifo)->maxSize,\
+(fifo)->length -= 1,1:0)
+/*
 #define GFIFO_IN(fifo,temp,type)		{if(!GFIFO_FULL(fifo)){\
 ((type *)(fifo)->data)[(fifo)->head] = temp;\
 (fifo)->head = ((fifo)->head+1)%(fifo)->maxSize;\
 (fifo)->length++;\
 }\
-}
-
+}*/
+#define GFIFO_IN(fifo,temp,type)		((!GFIFO_FULL(fifo))?\
+((type *)(fifo)->data)[(fifo)->head] = temp,\
+(fifo)->head = ((fifo)->head+1)%(fifo)->maxSize,\
+(fifo)->length += 1,1:0)
+/*
 #define GFIFO_IN_FORCE(fifo,temp,type)	{if(!GFIFO_FULL(fifo)){\
 GFIFO_IN(fifo,temp,type);\
 }else{\
 FIFO_OUT(fifo);\
 GFIFO_IN(fifo,temp,type);\
 }\
-}
+}*/
+#define GFIFO_IN_FORCE(fifo,temp,type)	((!GFIFO_FULL(fifo))?\
+((type *)(fifo)->data)[(fifo)->head] = temp,\
+(fifo)->head = ((fifo)->head+1)%(fifo)->maxSize,\
+(fifo)->length += 1,1:\
+(fifo)->tail = ((fifo)->tail+1)%(fifo)->maxSize,\
+((type *)(fifo)->data)[(fifo)->head] = temp,\
+(fifo)->head = ((fifo)->head+1)%(fifo)->maxSize,1)
 
 #endif
 
