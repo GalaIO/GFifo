@@ -35,7 +35,7 @@ int main(){
 	while(1){
 		
 		scanf("%d",&cmd);
-		if(cmd == 'q'){
+		if(cmd == 3){
 			break;
 		}
 		switch(cmd){
@@ -43,11 +43,7 @@ int main(){
 			case 0:
 				printf("please input float int char...\r\n");
 				scanf("%f %d %c",&tmp.num,&tmp.count,&tmp.ch);
-				if(GFIFO_IN_FORCE(&fifo,tmp,test_t)){
-					printf("YES\r\n");
-				}else{
-					printf("ERROR\r\n");
-				}
+				GFIFO_IN_FORCE(&fifo,tmp,test_t);
 			break;
 			case 1:
 				if(GFIFO_OUT(&fifo,tmp,test_t)){
