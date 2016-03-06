@@ -3,6 +3,7 @@
  * Author: 	    GalaIO
  * Date:   	    2015-8-3 10:05 PM
  * Description: test the GFifo.
+ * Description: test the GFifo.
  *
 **/
 #include <stdio.h>
