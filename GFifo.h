@@ -5,6 +5,13 @@
  *					--one, you can input normal, but if FIFO is full, not input.
  *				 	--two, when the FIFO is full, then FIFO-output and FIFO-input again.
  *				-support FIFO_TOP, just look the TOP ele, not OUPUT it.
+
+ * Author: 	    GalaIO
+ * Date:   	    2016-3-16 10:10 AM
+ * Description: -add a stimulate stack method.
+ *				-if you want ot use it as fifo, GFIFO_IN() and GFIFO_OUT()
+ *				-if you want to use it as stack, GIGO_IN() and GFIFO_OUT_HEAD()
+ *
 **/
 
 #ifndef _BSP_FIFO3_H_
@@ -19,7 +26,7 @@ typedef struct __GFifo__{
 	unsigned short  length;
 	unsigned short  maxSize;
 
-}GFifo_t;
+}GFifo, *GFifo_ptr;
 
 //must call FIFO_INIT firstly.
 #define GFIFO_INIT(fifo,ptr,max_size){\
@@ -46,38 +53,21 @@ typedef struct __GFifo__{
 #define  GFIFO_EMPTY(fifo)   			(GFIFO_LEN(fifo)<=0)
 
 #define  GFIFO_TOP(fifo,type)    	(GFIFO_EMPTY(fifo)==0?((type *)(fifo)->data)[(fifo)->tail]:-1)
-/*
-#define  GFIFO_OUT(fifo,temp,type)		{if(!GFIFO_EMPTY(fifo)){\
-temp = ((type *)(fifo)->data)[(fifo)->tail];\
-(fifo)->tail = ((fifo)->tail+1)%(fifo)->maxSize;\
-(fifo)->length -= 1;\
-}else{\
-temp = *(type *)0;\
-}\
-}*/
+
 #define  GFIFO_OUT(fifo,temp,type)		((!GFIFO_EMPTY(fifo))?\
 (temp) = ((type *)(fifo)->data)[(fifo)->tail],\
 (fifo)->tail = ((fifo)->tail+1)%(fifo)->maxSize,\
 (fifo)->length -= 1,1:0)
-/*
-#define GFIFO_IN(fifo,temp,type)		{if(!GFIFO_FULL(fifo)){\
-((type *)(fifo)->data)[(fifo)->head] = temp;\
-(fifo)->head = ((fifo)->head+1)%(fifo)->maxSize;\
-(fifo)->length++;\
-}\
-}*/
+#define  GFIFO_OUT_HEAD(fifo,temp,type)		((!GFIFO_EMPTY(fifo))?\
+(fifo)->head = ((fifo)->head-1)<0?(fifo)->maxSize:((fifo)->head-1),\
+(temp) = ((type *)(fifo)->data)[(fifo)->head],\
+(fifo)->length -= 1,1:0)
+
 #define GFIFO_IN(fifo,temp,type)		((!GFIFO_FULL(fifo))?\
 ((type *)(fifo)->data)[(fifo)->head] = (temp),\
 (fifo)->head = ((fifo)->head+1)%(fifo)->maxSize,\
 (fifo)->length += 1,1:0)
-/*
-#define GFIFO_IN_FORCE(fifo,temp,type)	{if(!GFIFO_FULL(fifo)){\
-GFIFO_IN(fifo,temp,type);\
-}else{\
-FIFO_OUT(fifo);\
-GFIFO_IN(fifo,temp,type);\
-}\
-}*/
+
 #define GFIFO_IN_FORCE(fifo,temp,type)	{if(!GFIFO_FULL(fifo)){\
 ((type *)(fifo)->data)[(fifo)->head] = (temp);\
 (fifo)->head = ((fifo)->head+1)%((fifo)->maxSize);\
